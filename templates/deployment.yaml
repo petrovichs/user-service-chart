@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "user-chart.fullname" . }}
+  labels:
+  {{- include "user-chart.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+  {{- include "user-chart.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+      {{- include "user-chart.selectorLabels" . | nindent 8 }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/config.yaml") . | sha256sum }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Chart.AppVersion }}"
+          ports:
+            - containerPort: 8080
+              name: web
+          env:
+            - name: POSTGRES_SERVICE
+              valueFrom:
+                secretKeyRef:
+                  key: POSTGRES_SERVICE
+                  name: user-secret
+            - name: POSTGRES_DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  key: POSTGRES_DB_NAME
+                  name: user-secret
+            - name: POSTGRES_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  key: POSTGRES_DB_USER
+                  name: user-secret
+            - name: POSTGRES_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: POSTGRES_DB_PASSWORD
+                  name: user-secret
