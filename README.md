@@ -14,3 +14,11 @@ helm install userservice .
 Модель и REST сгенерированы openapi-generator-maven-plugin
 
 Коллекция POSTMAN с запросами в файле otus.postman_collection
+
+
+
+helm uninstall userservice
+cd ../user-service
+docker build -t gorshkovpsergey/user-srv:v2 .
+cd ../user-service-chart
+helm install userservice .
